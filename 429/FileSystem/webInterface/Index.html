@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Engine Control</title>
+<link href="style.css" rel="stylesheet" type="text/css">
+<script>
+let d = document;
+
+function checkNumber(arg_id, min, max){
+  let element = d.getElementById(arg_id);
+  let num = parseInt(element.value, 10);
+  if(num != num||num<min||num>max){
+    element.classList.add('error-input-border');
+    element.classList.remove('correct-input-border');
+    return false;
+  }else{
+    element.classList.add('correct-input-border');
+    element.classList.remove('error-input-border');
+    return true;
+  }
+}
+
+function checkIp(arg_id){
+  let regexp=/^(?=\d+\.\d+\.\d+\.\d+$)(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.?){4}$/;
+  let element = d.getElementById(arg_id);
+  let result = regexp.test(element.value);
+  if(!result){
+    element.classList.add('error-input-border');
+    element.classList.remove('correct-input-border');
+   }else{
+    element.classList.add('correct-input-border');
+    element.classList.remove('error-input-border');
+  }
+  return result;
+}
+
+function checkSettings(){
+  let result = true;
+  result &= checkIp('IPAddress');
+  result &= checkIp('SubnetMask');
+  result &= checkIp('GateWay');
+  result &= checkNumber('Port',0,65535);
+  return result;
+}
+
+function readNetworkParameters(){
+  let request = new XMLHttpRequest();
+  request.open("GET","NetworkParameters.property?=",true);
+  request.timeout = 8000;
+  request.onreadystatechange = function(){
+    if(request.readyState != 4)return;
+    if(request.status != 200){
+	  alert(/*request.status==0?*/"Ошибка чтения настроек сети.");
+    }else{
+	  let parameters = JSON.parse (request.response);
+      d.getElementById('IPAddress').value = parameters.IPAddress;
+      d.getElementById('SubnetMask').value = parameters.SubnetMask;
+      d.getElementById('GateWay').value = parameters.GateWay;
+	  d.getElementById('Port').value = parameters.Port;
+	}
+  }
+  try{
+    request.send(null);
+  }
+  catch(exception){
+    alert(exception);
+  }
+}
+
+function writeNetworkParameters(){
+  if(!checkSettings()){
+    alert("Ошибка ввода настроек сети.");
+	return;
+  }
+  
+  let parameters ={
+    IPAddress: d.getElementById("IPAddress").value,
+    SubnetMask: d.getElementById("SubnetMask").value,
+    GateWay: d.getElementById("GateWay").value,
+    Port: d.getElementById("Port").value,
+  };
+  
+  let request = new XMLHttpRequest();
+  request.open("GET", "NetworkParameters.property=" + JSON.stringify(parameters), true);
+
+  request.timeout = 8000;
+  request.onreadystatechange = function(){
+    if(request.readyState != 4)return;
+    if(request.status != 200){
+	  alert(request.status==0?"Таймаут записи настроек сети":request.statusText);
+    }else{
+	  alert("Настройки сети были записаны успешно.");
+	}
+  }
+  try{
+	  request.send(null);
+  }
+  catch(exception){
+	  alert(exception);
+  }
+}
+
+function rebootDevice(){
+  let request = new XMLHttpRequest();
+  request.open("GET","reboot",true);
+  request.timeout = 8000;
+  request.onreadystatechange = function(){
+    if(request.readyState != 4)return;
+    if(request.status != 200){
+	  alert("Таймаут выполнения команды перезагрузки");
+    }else{
+	  alert("Устройство перезагружено успешно.");
+	}
+  }
+  try{
+    request.send(null);
+  }
+  catch(exception){
+    alert(exception);
+  }
+}
+
+function pageResizeControl(){
+  let height = d.documentElement.clientHeight;
+  if(height<500)height = 500-74;
+  else height = height-74;
+  let mainBlock = d.getElementById("mainBlock");
+  if(mainBlock!=mainBlock) return;
+  d.getElementById("mainBlock").setAttribute("style","height:"+height+"px");
+}
+
+function pageLoad(){
+ pageResizeControl(); 
+ readNetworkParameters();
+}
+
+</script>
+</head>
+<body onload="pageLoad()" onresize="pageResizeControl()">
+  <div class="header">
+    <h1>Устройство контроля состояния двигателя</h1>
+  </div>
+  <div class="divTable">
+    <div class="navigationBar">
+      <ul class = "menu">
+        <li><a href = "Index.html">Сетевые настройки</a></li>
+        <li><a href = "Control.html">Управление и контроль</a></li>
+        <li><a href = "Debug.html">Отладка</a></li>
+        <li><a href = "Update.html" onclick="alert('Дождитесь перехода на страницу обновлений')">Обновление</a></li>
+      </ul>
+    </div>
+  <div  id="mainBlock" class="mainBlock">
+    <h2>Сетевые настройки</h2>
+    <div class="divTable">
+      <div class="divCell">
+        <label for="IPAddress">IP адрес</label>
+        <input type="text" class="long" id="IPAddress" oninput="checkIp('IPAddress')">
+      </div>
+      <div class="divCell">
+        <label for="SubnetMask">Маска подсети</label>
+        <input type="text" class="long" id="SubnetMask" oninput="checkIp('SubnetMask')">
+      </div>
+    </div>
+    <div class="divTable">
+      <div class="divCell">
+        <label for="GateWay">Адрес шлюза</label>
+        <input type="text" class="long" id="GateWay" oninput="checkIp('GateWay')">
+      </div>
+      <div class="divCell">
+        <label for="ModbusPort">Modbus Порт</label>
+        <input type="text" class="long" id="Port" oninput="checkNumber('Port',0,65535)"-->
+      </div>
+    </div>
+    <div class="divTable">
+      <div class="divCell">
+        <div class = "vBlock"><input type="button" class="long" value = "Сохранить настройки" onclick="writeNetworkParameters()"></div>
+      </div>
+      <div class="divCell">
+        <div class = "vBlock"><input type="button" class="long" value = "Перезагрузить устройство" onclick="rebootDevice()"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

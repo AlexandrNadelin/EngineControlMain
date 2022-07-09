@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Engine Control</title>
+<link href="style.css" rel="stylesheet" type="text/css">
+<script>
+let d = document;
+
+let intervalTime =500;
+let timerId;
+let getDevDataErrorCounter =0;
+
+function getDeviceData(){
+  let request = new XMLHttpRequest();
+  request.open("GET","DebugTimes?=",true);
+  request.timeout = 8000;
+  request.onreadystatechange = function(){
+    if(request.readyState != 4)return;
+    if(request.status != 200){
+	  clearInterval(timerId);
+	  intervalTime=5000;
+	  timerId = setInterval(getDeviceData,intervalTime);
+	  if(++getDevDataErrorCounter>5){
+		clearInterval(timerId);
+		//alert("Ошибка чтения данных.");
+	  }
+    }else{	
+	  let parameters = JSON.parse(request.response);
+	  getDevDataErrorCounter=0;
+	  for (let i = 0; i < 118; i++){
+        d.getElementById('l_'+(i+1)).value = parameters.times[i].toString();
+      }
+	  if(intervalTime==5000){
+	    clearInterval(timerId);
+	    intervalTime=500;
+	    timerId = setInterval(getDeviceData,intervalTime);
+	  }
+	}
+  }
+  try{
+    request.send(null);
+  }
+  catch(exception){
+    alert(exception);
+  }
+}
+
+function pageResizeControl(){
+  let height = d.documentElement.clientHeight;
+  if(height<500)height = 500-74;
+  else height = height-74;
+  let mainBlock = d.getElementById("mainBlock");
+  if(mainBlock!=mainBlock) return;
+  d.getElementById("mainBlock").setAttribute("style","height:"+height+"px");
+}
+
+function pageLoad(){
+ pageResizeControl(); 
+ timerId = setInterval(getDeviceData,intervalTime);
+}
+
+</script>
+</head>
+<body onload="pageLoad()" onresize="pageResizeControl()">
+  <div class="header">
+    <h1>Устройство контроля состояния двигателя</h1>
+  </div>
+  <div class="divTable">
+    <div class="navigationBar">
+      <ul class = "menu">
+        <li><a href = "Index.html">Сетевые настройки</a></li>
+        <li><a href = "Control.html">Управление и контроль</a></li>
+        <li><a href = "Debug.html">Отладка</a></li>
+        <li><a href = "Update.html" onclick="alert('Дождитесь перехода на страницу обновлений')">Обновление</a></li>
+      </ul>
+    </div>
+  <div  id="mainBlock" class="mainBlock">
+    <div class="dataBlock2">
+      <h2>Временные интервалы, мс (1,5,3)</h2>
+	  <table>
+	    <tr>
+	      <td>1 <input type="text" class="tiny" id="l_1"></td>
+	      <td>2 <input type="text" class="tiny" id="l_2"></td>
+	      <td>3 <input type="text" class="tiny" id="l_3"></td>
+	      <td>4 <input type="text" class="tiny" id="l_4"></td>
+	      <td>5 <input type="text" class="tiny" id="l_5"></td>
+	      <td>6 <input type="text" class="tiny" id="l_6"></td>
+	      <td>7 <input type="text" class="tiny" id="l_7"></td>
+	      <td>8 <input type="text" class="tiny" id="l_8"></td>
+	      <td>9 <input type="text" class="tiny" id="l_9"></td>
+	      <td>10 <input type="text" class="tiny" id="l_10"></td>
+	    </tr>
+	    <tr>
+	      <td>11 <input type="text" class="tiny" id="l_11"></td>
+	      <td>12 <input type="text" class="tiny" id="l_12"></td>
+	      <td>13 <input type="text" class="tiny" id="l_13"></td>
+	      <td>14 <input type="text" class="tiny" id="l_14"></td>
+	      <td>15 <input type="text" class="tiny" id="l_15"></td>
+	      <td>16 <input type="text" class="tiny" id="l_16"></td>
+	      <td>17 <input type="text" class="tiny" id="l_17"></td>
+	      <td>18 <input type="text" class="tiny" id="l_18"></td>
+	      <td>19 <input type="text" class="tiny" id="l_19"></td>
+	      <td>20 <input type="text" class="tiny" id="l_20"></td>
+	    </tr>
+	    <tr>
+	      <td>21 <input type="text" class="tiny" id="l_21"></td>
+	      <td>22 <input type="text" class="tiny" id="l_22"></td>
+	      <td>23 <input type="text" class="tiny" id="l_23"></td>
+	      <td>24 <input type="text" class="tiny" id="l_24"></td>
+	      <td>25 <input type="text" class="tiny" id="l_25"></td>
+	      <td>26 <input type="text" class="tiny" id="l_26"></td>
+	      <td>27 <input type="text" class="tiny" id="l_27"></td>
+	      <td>28 <input type="text" class="tiny" id="l_28"></td>
+	      <td>29 <input type="text" class="tiny" id="l_29"></td>
+	      <td>30 <input type="text" class="tiny" id="l_30"></td>
+	    </tr>
+	    <tr>
+	      <td>31 <input type="text" class="tiny" id="l_31"></td>
+	      <td>32 <input type="text" class="tiny" id="l_32"></td>
+	      <td>33 <input type="text" class="tiny" id="l_33"></td>
+	      <td>34 <input type="text" class="tiny" id="l_34"></td>
+	      <td>35 <input type="text" class="tiny" id="l_35"></td>
+	      <td>36 <input type="text" class="tiny" id="l_36"></td>
+	      <td>37 <input type="text" class="tiny" id="l_37"></td>
+	      <td>38 <input type="text" class="tiny" id="l_38"></td>
+	      <td>39 <input type="text" class="tiny" id="l_39"></td>
+	      <td>40 <input type="text" class="tiny" id="l_40"></td>
+	    </tr>
+	    <tr>
+	      <td>41 <input type="text" class="tiny" id="l_41"></td>
+	      <td>42 <input type="text" class="tiny" id="l_42"></td>
+	      <td>43 <input type="text" class="tiny" id="l_43"></td>
+	      <td>44 <input type="text" class="tiny" id="l_44"></td>
+	      <td>45 <input type="text" class="tiny" id="l_45"></td>
+	      <td>46 <input type="text" class="tiny" id="l_46"></td>
+	      <td>47 <input type="text" class="tiny" id="l_47"></td>
+	      <td>48 <input type="text" class="tiny" id="l_48"></td>
+	      <td>49 <input type="text" class="tiny" id="l_49"></td>
+	      <td>50 <input type="text" class="tiny" id="l_50"></td>
+	    </tr>
+	    <tr>
+	      <td>51 <input type="text" class="tiny" id="l_51"></td>
+	      <td>52 <input type="text" class="tiny" id="l_52"></td>
+	      <td>53 <input type="text" class="tiny" id="l_53"></td>
+	      <td>54 <input type="text" class="tiny" id="l_54"></td>
+	      <td>55 <input type="text" class="tiny" id="l_55"></td>
+	      <td>56 <input type="text" class="tiny" id="l_56"></td>
+	      <td>57 <input type="text" class="tiny" id="l_57"></td>
+	      <td>58 <input type="text" class="tiny" id="l_58"></td>
+	      <td>59 <input type="text" class="tiny" id="l_59"></td>
+	    </tr>
+	  </table>
+      <h2>Временные интервалы, мс (6,2,4)</h2>
+	  <table>
+	    <tr>
+	      <td>1 <input type="text" class="tiny" id="l_60"></td>
+	      <td>2 <input type="text" class="tiny" id="l_61"></td>
+	      <td>3 <input type="text" class="tiny" id="l_62"></td>
+	      <td>4 <input type="text" class="tiny" id="l_63"></td>
+	      <td>5 <input type="text" class="tiny" id="l_64"></td>
+	      <td>6 <input type="text" class="tiny" id="l_65"></td>
+	      <td>7 <input type="text" class="tiny" id="l_66"></td>
+	      <td>8 <input type="text" class="tiny" id="l_67"></td>
+	      <td>9 <input type="text" class="tiny" id="l_68"></td>
+	      <td>10 <input type="text" class="tiny" id="l_69"></td>
+	    </tr>
+	    <tr>
+	      <td>11 <input type="text" class="tiny" id="l_70"></td>
+	      <td>12 <input type="text" class="tiny" id="l_71"></td>
+	      <td>13 <input type="text" class="tiny" id="l_72"></td>
+	      <td>14 <input type="text" class="tiny" id="l_73"></td>
+	      <td>15 <input type="text" class="tiny" id="l_74"></td>
+	      <td>16 <input type="text" class="tiny" id="l_75"></td>
+	      <td>17 <input type="text" class="tiny" id="l_76"></td>
+	      <td>18 <input type="text" class="tiny" id="l_77"></td>
+	      <td>19 <input type="text" class="tiny" id="l_78"></td>
+	      <td>20 <input type="text" class="tiny" id="l_79"></td>
+	    </tr>
+	    <tr>
+	      <td>21 <input type="text" class="tiny" id="l_80"></td>
+	      <td>22 <input type="text" class="tiny" id="l_81"></td>
+	      <td>23 <input type="text" class="tiny" id="l_82"></td>
+	      <td>24 <input type="text" class="tiny" id="l_83"></td>
+	      <td>25 <input type="text" class="tiny" id="l_84"></td>
+	      <td>26 <input type="text" class="tiny" id="l_85"></td>
+	      <td>27 <input type="text" class="tiny" id="l_86"></td>
+	      <td>28 <input type="text" class="tiny" id="l_87"></td>
+	      <td>29 <input type="text" class="tiny" id="l_88"></td>
+	      <td>30 <input type="text" class="tiny" id="l_89"></td>
+	    </tr>
+	    <tr>
+	      <td>31 <input type="text" class="tiny" id="l_90"></td>
+	      <td>32 <input type="text" class="tiny" id="l_91"></td>
+	      <td>33 <input type="text" class="tiny" id="l_92"></td>
+	      <td>34 <input type="text" class="tiny" id="l_93"></td>
+	      <td>35 <input type="text" class="tiny" id="l_94"></td>
+	      <td>36 <input type="text" class="tiny" id="l_95"></td>
+	      <td>37 <input type="text" class="tiny" id="l_96"></td>
+	      <td>38 <input type="text" class="tiny" id="l_97"></td>
+	      <td>39 <input type="text" class="tiny" id="l_98"></td>
+	      <td>40 <input type="text" class="tiny" id="l_99"></td>
+	    </tr>
+	    <tr>
+	      <td>41 <input type="text" class="tiny" id="l_100"></td>
+	      <td>42 <input type="text" class="tiny" id="l_101"></td>
+	      <td>43 <input type="text" class="tiny" id="l_102"></td>
+	      <td>44 <input type="text" class="tiny" id="l_103"></td>
+	      <td>45 <input type="text" class="tiny" id="l_104"></td>
+	      <td>46 <input type="text" class="tiny" id="l_105"></td>
+	      <td>47 <input type="text" class="tiny" id="l_106"></td>
+	      <td>48 <input type="text" class="tiny" id="l_107"></td>
+	      <td>49 <input type="text" class="tiny" id="l_108"></td>
+	      <td>50 <input type="text" class="tiny" id="l_109"></td>
+	    </tr>
+	    <tr>
+	      <td>51 <input type="text" class="tiny" id="l_110"></td>
+	      <td>52 <input type="text" class="tiny" id="l_111"></td>
+	      <td>53 <input type="text" class="tiny" id="l_112"></td>
+	      <td>54 <input type="text" class="tiny" id="l_113"></td>
+	      <td>55 <input type="text" class="tiny" id="l_114"></td>
+	      <td>56 <input type="text" class="tiny" id="l_115"></td>
+	      <td>57 <input type="text" class="tiny" id="l_116"></td>
+	      <td>58 <input type="text" class="tiny" id="l_117"></td>
+	      <td>59 <input type="text" class="tiny" id="l_118"></td>
+	    </tr>
+	  </table>
+    </div>
+  </div>
+</body>
+</html>

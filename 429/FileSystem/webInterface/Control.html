@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Engine Control</title>
+<link href="style.css" rel="stylesheet" type="text/css">
+<script>
+let d = document;
+
+let intervalTime =500;
+let timerId;
+let getDevDataErrorCounter =0;
+
+function getDeviceData(){
+  let request = new XMLHttpRequest();
+  request.open("GET","DeviceData?=",true);
+  request.timeout = 8000;
+  request.onreadystatechange = function(){
+    if(request.readyState != 4)return;
+    if(request.status != 200){
+	  clearInterval(timerId);
+	  intervalTime=5000;
+	  timerId = setInterval(getDeviceData,intervalTime);
+	  if(++getDevDataErrorCounter>5){
+		clearInterval(timerId);
+		//alert("Ошибка чтения данных.");
+	  }
+    }else{
+	  let parameters = JSON.parse(request.response);
+	  getDevDataErrorCounter=0;
+	  for (let i = 0; i < 6; i++){
+        d.getElementById('misfire_'+(i+1)).value = parameters.misfire[i].toString(16);
+      }
+	  for (let i = 0; i < 6; i++){
+        d.getElementById('fireError_'+(i+1)).value = parameters.fireError[i].toString(16);
+      }
+	  d.getElementById('misfireCounter').value = parameters.misfireCounter.toString();
+	  d.getElementById('fireErrorCylinder').value = parameters.fireErrorCylinder.toString();
+	  for (let i = 0; i < 6; i++){
+        d.getElementById('Times_'+(i+1)).value = parameters.Times[i].toString();
+      }
+	  if(intervalTime==5000){
+	    clearInterval(timerId);
+	    intervalTime=500;
+	    timerId = setInterval(getDeviceData,intervalTime);
+	  }
+	}
+  }
+  try{
+    request.send(null);
+  }
+  catch(exception){
+    alert(exception);
+  }
+}
+
+function pageResizeControl(){
+  let height = d.documentElement.clientHeight;
+  if(height<500)height = 500-74;
+  else height = height-74;
+  let mainBlock = d.getElementById("mainBlock");
+  if(mainBlock!=mainBlock) return;
+  d.getElementById("mainBlock").setAttribute("style","height:"+height+"px");
+}
+
+function pageLoad(){
+ pageResizeControl(); 
+ timerId = setInterval(getDeviceData,intervalTime);
+}
+
+</script>
+</head>
+<body onload="pageLoad()" onresize="pageResizeControl()">
+  <div class="header">
+    <h1>Устройство контроля состояния двигателя</h1>
+  </div>
+  <div class="divTable">
+    <div class="navigationBar">
+      <ul class = "menu">
+        <li><a href = "Index.html">Сетевые настройки</a></li>
+        <li><a href = "Control.html">Управление и контроль</a></li>
+        <li><a href = "Debug.html">Отладка</a></li>
+        <li><a href = "Update.html" onclick="alert('Дождитесь перехода на страницу обновлений')">Обновление</a></li>
+      </ul>
+    </div>
+  <div  id="mainBlock" class="mainBlock">
+    <div class="dataBlock">
+      <h2>Состояние двигателя</h2>
+      <h3>Пропуски зажигания цилиндров</h3>
+      <div class="divTable">
+        <div class="divCell">1 <input type="text" class="short" id="misfire_1"></div>
+        <div class="divCell">2 <input type="text" class="short" id="misfire_2"></div>
+        <div class="divCell">3 <input type="text" class="short" id="misfire_3"></div>
+        <div class="divCell">4 <input type="text" class="short" id="misfire_4"></div>
+        <div class="divCell">5 <input type="text" class="short" id="misfire_5"></div>
+        <div class="divCell">6 <input type="text" class="short" id="misfire_6"></div>
+      </div>
+      <h3>Ошибки зажигания цилиндров</h3>
+      <div class="divTable">
+        <div class="divCell">1 <input type="text" class="short" id="fireError_1"></div>
+        <div class="divCell">2 <input type="text" class="short" id="fireError_2"></div>
+        <div class="divCell">3 <input type="text" class="short" id="fireError_3"></div>
+        <div class="divCell">4 <input type="text" class="short" id="fireError_4"></div>
+        <div class="divCell">5 <input type="text" class="short" id="fireError_5"></div>
+        <div class="divCell">6 <input type="text" class="short" id="fireError_6"></div>
+      </div>	
+      <div class="divTable">
+        <div class="divCell">
+          <label for="misfireCounter">Счетчик пропусков</label>
+          <input type="text" class="long" id="misfireCounter">
+        </div>
+        <div class="divCell">
+          <label for="fireErrorCylinder">Счетчик ошибок</label>
+          <input type="text" class="long" id="fireErrorCylinder">
+        </div>
+      </div>
+    </div>
+	<div class="imageContainer">
+      <img src="Engine.png" alt="Engine">
+      <div class="cylinder1">
+	    <label for="Times_1">Время цилиндр 1, мс</label>
+        <input type="text" class="middle" id="Times_1">
+	    <label for="Times_6">Время цилиндр 6, мс</label>
+        <input type="text" class="middle" id="Times_6">	    
+	  </div>
+      <div class="cylinder2">
+	    <label for="Times_2">Время цилиндр 2, мс</label>
+        <input type="text" class="middle" id="Times_2">
+	    <label for="Times_5">Время цилиндр 5, мс</label>
+        <input type="text" class="middle" id="Times_5">	  
+	  </div>
+      <div class="cylinder3">
+	    <label for="Times_3">Время цилиндр 3, мс</label>
+        <input type="text" class="middle" id="Times_3">
+	    <label for="Times_4">Время цилиндр 4, мс</label>
+        <input type="text" class="middle" id="Times_4">
+	  </div>
+    </div>
+  </div>
+</body>
+</html>
