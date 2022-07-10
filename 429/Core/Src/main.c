@@ -387,7 +387,7 @@ static void MX_TIM5_Init(void)
   {
     Error_Handler();
   }
-  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
   sConfigIC.ICSelection = TIM_ICSELECTION_DIRECTTI;
   sConfigIC.ICPrescaler = TIM_ICPSC_DIV1;
   sConfigIC.ICFilter = 4;
@@ -395,7 +395,7 @@ static void MX_TIM5_Init(void)
   {
     Error_Handler();
   }
-  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_FALLING;
+  sConfigIC.ICPolarity = TIM_INPUTCHANNELPOLARITY_RISING;
   if (HAL_TIM_IC_ConfigChannel(&htim5, &sConfigIC, TIM_CHANNEL_4) != HAL_OK)
   {
     Error_Handler();
@@ -487,8 +487,8 @@ static void MX_GPIO_Init(void)
                            GPIO_EXTI4_IGNITION_5_Pin GPIO_EXTI5_IGNITION_6_Pin */
   GPIO_InitStruct.Pin = GPIO_EXTI0_IGNITION_1_Pin|GPIO_EXTI1_IGNITION_2_Pin|GPIO_EXTI2_IGNITION_3_Pin|GPIO_EXTI3_IGNITION_4_Pin
                           |GPIO_EXTI4_IGNITION_5_Pin|GPIO_EXTI5_IGNITION_6_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
-  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
