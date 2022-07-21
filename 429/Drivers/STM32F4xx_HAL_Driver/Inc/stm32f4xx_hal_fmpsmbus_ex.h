@@ -38,6 +38,7 @@ extern "C" {
   */
 
 /* Exported types ------------------------------------------------------------*/
+
 /* Exported constants --------------------------------------------------------*/
 /** @defgroup FMPSMBUSEx_Exported_Constants FMPSMBUS Extended Exported Constants
   * @{
@@ -70,15 +71,7 @@ extern "C" {
   * @{
   */
 
-/** @addtogroup FMPSMBUSEx_Exported_Functions_Group2 WakeUp Mode Functions
-  * @{
-  */
-/* Peripheral Control functions  ************************************************/
-/**
-  * @}
-  */
-
-/** @addtogroup FMPSMBUSEx_Exported_Functions_Group3 Fast Mode Plus Functions
+/** @addtogroup FMPSMBUSEx_Exported_Functions_Group3 FMPSMBUS Extended FastModePlus Functions
   * @{
   */
 void HAL_FMPSMBUSEx_EnableFastModePlus(uint32_t ConfigFastModePlus);
@@ -104,10 +97,8 @@ void HAL_FMPSMBUSEx_DisableFastModePlus(uint32_t ConfigFastModePlus);
 /** @defgroup FMPSMBUSEx_Private_Macro FMPSMBUS Extended Private Macros
   * @{
   */
-#define IS_FMPSMBUS_FASTMODEPLUS(__CONFIG__) ((((__CONFIG__) & (FMPSMBUS_FASTMODEPLUS_SCL)) == \
-                                              FMPSMBUS_FASTMODEPLUS_SCL) || \
-                                           (((__CONFIG__) & (FMPSMBUS_FASTMODEPLUS_SDA)) == \
-                                              FMPSMBUS_FASTMODEPLUS_SDA))
+#define IS_FMPSMBUS_FASTMODEPLUS(__CONFIG__) ((((__CONFIG__) & (FMPSMBUS_FASTMODEPLUS_SCL)) == FMPSMBUS_FASTMODEPLUS_SCL) || \
+                                            (((__CONFIG__) & (FMPSMBUS_FASTMODEPLUS_SDA)) == FMPSMBUS_FASTMODEPLUS_SDA))
 /**
   * @}
   */
@@ -116,7 +107,7 @@ void HAL_FMPSMBUSEx_DisableFastModePlus(uint32_t ConfigFastModePlus);
 /** @defgroup FMPSMBUSEx_Private_Functions FMPSMBUS Extended Private Functions
   * @{
   */
-/* Private functions are defined in stm32f4xx_hal_fmpsmbus_ex.c file */
+/* Private functions are defined in stm32f4xx_hal_fmpfmpsmbus_ex.c file */
 /**
   * @}
   */

@@ -124,6 +124,9 @@ uint32_t oneMarkRefTick = (uint32_t)(84000000.0F/((1500.0F/60.0F)*60.0F));/*вр
 
 uint32_t camshaftOneTurnTickRef = (uint32_t)(84000000.0F/(750.0F/60.0F));/*время одного оборота в тиках*/
 
+
+uint32_t lastFireErrorCylinderTicks[6]={0,0,0,0,0,0};
+uint32_t lastMisfireCylinderTicks[6]={0,0,0,0,0,0};
 //---DEL---//
 /*uint8_t cylinder_1_crankshaft_pos =0;
 uint8_t cylinder_2_crankshaft_pos =0;
@@ -146,7 +149,11 @@ static void MX_TIM5_Init(void);
 /* USER CODE BEGIN 0 */
 void modbusRequestProcessedCallback(uint8_t modbusRequestType,uint16_t regAddress,uint16_t regCount)
 {
-	if(modbusRequestType==WRITE_COIL_REGISTER && regAddress==0)deviceData.misfireCounter=0;
+	if(modbusRequestType==WRITE_COIL_REGISTER && regAddress==0)
+	{
+		deviceData.misfireCounter=0;
+		
+	}
 	else if(modbusRequestType==WRITE_COIL_REGISTER && regAddress==1)deviceData.fireErrorCounter=0;
 	else if(modbusRequestType==WRITE_COIL_REGISTERS)
 	{
@@ -221,7 +228,6 @@ int main(void)
   MX_TIM5_Init();
 	
 	printf("Main App started.\r\n");
-	printf("Test.\r\n");
 	
 	ModbusTCPServer_Init(&modbusTCPServer);
 	HTTPServer_Init(&httpServer);
@@ -280,9 +286,9 @@ int main(void)
 		  HAL_GPIO_WritePin(LD3_GPIO_Port,LD3_Pin,GPIO_PIN_RESET);//RED
 			
 			NetworkParameters networkParameters ={
-			  .ipAddr={192,168,4,251},
+			  .ipAddr={192,168,1,251},
 			  .netMask={255,255,255,0},
-	      .gateWay={192,168,4,001},
+	      .gateWay={192,168,1,001},
 			  .modbusPort=502,
 		  };
 			memoryWriteNetworkParameters(&networkParameters);
@@ -291,6 +297,12 @@ int main(void)
 			
 			buttonResetIPReleaseTime = HAL_GetTick();
 	  }
+		
+		for(int i =0; i<6;i++)
+		{
+			if(deviceData.fireErrorCylinder[i] && GetTimeSpan(lastFireErrorCylinderTicks[i],HAL_GetTick())>4000)deviceData.fireErrorCylinder[i]=0x00;
+			if(deviceData.misfireCylinder[i] && GetTimeSpan(lastMisfireCylinderTicks[i],HAL_GetTick())>4000)deviceData.misfireCylinder[i]=0;
+		}
 		
     /* USER CODE END WHILE */
 
@@ -438,8 +450,8 @@ static void MX_GPIO_Init(void)
                            IGNITION_EN_1_Pin IGNITION_EN_2_Pin */
   GPIO_InitStruct.Pin = IGNITION_EN_3_Pin|IGNITION_EN_4_Pin|IGNITION_EN_5_Pin|IGNITION_EN_6_Pin
                           |IGNITION_EN_1_Pin|IGNITION_EN_2_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
@@ -529,6 +541,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		if(deviceData.isDataProcessAllowed && deviceData.currentCylinder!=1)//искра там где не надо
 		{
+			lastFireErrorCylinderTicks[0]=HAL_GetTick();
 			if(deviceData.fireErrorCylinder[0]&0x80)deviceData.fireErrorCylinder[0]=0x81;
 			else 
 			{
@@ -546,6 +559,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		if(deviceData.isDataProcessAllowed && deviceData.currentCylinder!=2)//искра там где не надо
 		{
+			lastFireErrorCylinderTicks[1]=HAL_GetTick();
 			if(deviceData.fireErrorCylinder[1]&0x80)deviceData.fireErrorCylinder[1]=0x81;
 			else 
 			{
@@ -563,6 +577,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		if(deviceData.isDataProcessAllowed && deviceData.currentCylinder!=3)//искра там где не надо
 		{
+			lastFireErrorCylinderTicks[2]=HAL_GetTick();
 			if(deviceData.fireErrorCylinder[2]&0x80)deviceData.fireErrorCylinder[2]=0x81;
 			else 
 			{
@@ -580,6 +595,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		if(deviceData.isDataProcessAllowed && deviceData.currentCylinder!=4)//искра там где не надо
 		{
+			lastFireErrorCylinderTicks[3]=HAL_GetTick();
 			if(deviceData.fireErrorCylinder[3]&0x80)deviceData.fireErrorCylinder[3]=0x81;
 			else 
 			{
@@ -597,6 +613,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		if(deviceData.isDataProcessAllowed && deviceData.currentCylinder!=5)//искра там где не надо
 		{
+			lastFireErrorCylinderTicks[4]=HAL_GetTick();
 			if(deviceData.fireErrorCylinder[4]&0x80)deviceData.fireErrorCylinder[4]=0x81;
 			else 
 			{
@@ -614,6 +631,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		if(deviceData.isDataProcessAllowed && deviceData.currentCylinder!=6)//искра там где не надо
 		{
+			lastFireErrorCylinderTicks[5]=HAL_GetTick();
 			if(deviceData.fireErrorCylinder[5]&0x80)deviceData.fireErrorCylinder[5]=0x81;
 			else 
 			{
@@ -713,28 +731,32 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 				if(deviceData.crankshaftCurPos==50/*45*/)//(deviceData.crankshaftCurPos>44 || (deviceData.crankshaftCurPos>=0 && deviceData.crankshaftCurPos<5))
 				{
 					//проверяем происходило ли зажигание в 3 и 4 цилиндрах
-					if(deviceData.currentCylinder==3)//прошлый цилиндр - 1
+					if(deviceData.currentCylinder==3)//прошлый цилиндр - 3
 					{
+						//сбрасываем флаги зажигание произошло в 6 цилиндре
+					  deviceData.isCylinderFiredMask&=~0x20;
+						
 						if(!(deviceData.isCylinderFiredMask&0x04))//поджигание смеси в третьем цилиндре не происходило, авария
 						{//еще проверить отрицательное ускорени результат - операция или
 							deviceData.misfireCylinder[2] =0x01;
+							lastMisfireCylinderTicks[2]=HAL_GetTick();
 							deviceData.misfireCounter++;
 						}
-						else deviceData.misfireCylinder[2] =0x00;
+						//else deviceData.misfireCylinder[2] =0x00;
 					}
-					else if(deviceData.currentCylinder==4)//прошлый цилиндр - 6
+					else if(deviceData.currentCylinder==4)//прошлый цилиндр - 4
 					{
+						//сбрасываем флаги зажигание произошло в 1 цилиндре
+					  deviceData.isCylinderFiredMask&=~0x01;
+						
 						if(!(deviceData.isCylinderFiredMask&0x08))//поджигание смеси в четвертом цилиндре не происходило, авария
 						{
 							deviceData.misfireCylinder[3] =0x01;
+							lastMisfireCylinderTicks[3]=HAL_GetTick();
 							deviceData.misfireCounter++;
 						}
-						else deviceData.misfireCylinder[3] =0x00;
+						//else deviceData.misfireCylinder[3] =0x00;
 					}
-					
-					//сбрасываем флаги зажигание произошло в 1 и 6 цилиндрах
-					if(deviceData.currentCylinder==1)deviceData.isCylinderFiredMask&=~0x01;
-					else if(deviceData.currentCylinder==6)deviceData.isCylinderFiredMask&=~0x20;	
 					
 					//deviceData.currentCylinderForAccelerationCalc=deviceData.currentCylinder;
 				}	
@@ -777,26 +799,30 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 					//проверяем происходило ли зажигание в 1 и 6 цилиндрах
 					if(deviceData.currentCylinder==1)//прошлый цилиндр - 1
 					{
+						//сбрасываем флаги зажигание произошло в 5 цилиндре
+					  deviceData.isCylinderFiredMask&=~0x10;
+						
 						if(!(deviceData.isCylinderFiredMask&0x01))//поджигание смеси в первом цилиндре не происходило, авария
 						{//еще проверить отрицательное ускорени результат - операция или
 							deviceData.misfireCylinder[0] =0x01;
+							lastMisfireCylinderTicks[0]=HAL_GetTick();
 							deviceData.misfireCounter++;
 						}
-						else deviceData.misfireCylinder[0] =0x00;
+						//else deviceData.misfireCylinder[0] =0x00;
 					}
 					else if(deviceData.currentCylinder==6)//прошлый цилиндр - 6
 					{
+						//сбрасываем флаги зажигание произошло в 2 цилиндре
+					  deviceData.isCylinderFiredMask&=~0x02;
+						
 						if(!(deviceData.isCylinderFiredMask&0x20))//поджигание смеси в шестом цилиндре не происходило, авария
 						{
 							deviceData.misfireCylinder[5] =0x01;
+							lastMisfireCylinderTicks[5]=HAL_GetTick();
 							deviceData.misfireCounter++;
 						}
-						else deviceData.misfireCylinder[5] =0x00;
+						//else deviceData.misfireCylinder[5] =0x00;
 					}
-					
-					//сбрасываем флаги зажигание произошло в 2 и 5 цилиндрах
-					if(deviceData.currentCylinder==2)deviceData.isCylinderFiredMask&=~0x02;
-					else if(deviceData.currentCylinder==5)deviceData.isCylinderFiredMask&=~0x10;
 					
 					//deviceData.currentCylinderForAccelerationCalc=deviceData.currentCylinder;
 				}
@@ -831,29 +857,30 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 					//проверяем происходило ли зажигание в 2 и 5 цилиндрах
 					if(deviceData.currentCylinder==2)//прошлый цилиндр - 2
 					{
+						//сбрасываем флаги зажигание произошло в 4 цилиндрах
+					  deviceData.isCylinderFiredMask&=~0x08;
+						
 						if(!(deviceData.isCylinderFiredMask&0x02))//поджигание смеси во втором цилиндре не происходило, авария
 						{//еще проверить отрицательное ускорени результат - операция или
 							deviceData.misfireCylinder[1] =0x01;
+							lastMisfireCylinderTicks[1]=HAL_GetTick();
 							deviceData.misfireCounter++;
 						}
-						else deviceData.misfireCylinder[1] =0x00;
+						//else deviceData.misfireCylinder[1] =0x00;
 					}
 					else if(deviceData.currentCylinder==5)//прошлый цилиндр - 5
 					{
+						//сбрасываем флаги зажигание произошло в 3 цилиндрах
+					  deviceData.isCylinderFiredMask&=~0x04;
+						
 						if(!(deviceData.isCylinderFiredMask&0x10))//поджигание смеси в пятом цилиндре не происходило, авария
 						{
 							deviceData.misfireCylinder[4] =0x01;
+							lastMisfireCylinderTicks[4]=HAL_GetTick();
 							deviceData.misfireCounter++;
 						}
-						else 
-						{
-							deviceData.misfireCylinder[4] =0x00;
-						}
+						//else deviceData.misfireCylinder[4] =0x00;
 					}
-					
-					//сбрасываем флаги зажигание произошло в 3 и 4 цилиндрах
-					if(deviceData.currentCylinder==3)deviceData.isCylinderFiredMask&=~0x04;
-					else if(deviceData.currentCylinder==4)deviceData.isCylinderFiredMask&=~0x08;
 					
 					//deviceData.currentCylinderForAccelerationCalc=deviceData.currentCylinder;
 				}

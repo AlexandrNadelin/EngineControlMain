@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F429xx,STM32_THREAD_SAFE_STRATEGY</Define>
               <Undefine></Undefine>
-              <IncludePath>../LWIP/App;     ../LWIP/Target;     ../Core/Inc;     ../Middlewares/Third_Party/LwIP/src/include;     ../Middlewares/Third_Party/LwIP/system;     ../Drivers/STM32F4xx_HAL_Driver/Inc;     ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;     ../Middlewares/Third_Party/LwIP/src/include/netif/ppp;     ../Drivers/CMSIS/Device/ST/STM32F4xx/Include;     ../Middlewares/Third_Party/LwIP/src/include/lwip;     ../Middlewares/Third_Party/LwIP/src/include/lwip/apps;     ../Middlewares/Third_Party/LwIP/src/include/lwip/priv;     ../Middlewares/Third_Party/LwIP/src/include/lwip/prot;     ../Middlewares/Third_Party/LwIP/src/include/netif;     ../Middlewares/Third_Party/LwIP/src/include/compat/posix;     ../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa;     ../Middlewares/Third_Party/LwIP/src/include/compat/posix/net;     ../Middlewares/Third_Party/LwIP/src/include/compat/posix/sys;     ../Middlewares/Third_Party/LwIP/src/include/compat/stdc;     ../Middlewares/Third_Party/LwIP/system/arch;     ../Drivers/CMSIS/Include;     ..\TimeSpan;     ..\Memory;     ..\CoreDebug;     ..\HTTPServer;     ..\HTTPServer\json;     ..\FileSystem;     ..\Modbus;     ..\DeviceData</IncludePath>
+              <IncludePath>../LWIP/App;       ../LWIP/Target;       ../Core/Inc;       ../Middlewares/Third_Party/LwIP/src/include;       ../Middlewares/Third_Party/LwIP/system;       ../Drivers/STM32F4xx_HAL_Driver/Inc;       ../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy;       ../Middlewares/Third_Party/LwIP/src/include/netif/ppp;       ../Drivers/CMSIS/Device/ST/STM32F4xx/Include;       ../Middlewares/Third_Party/LwIP/src/include/lwip;       ../Middlewares/Third_Party/LwIP/src/include/lwip/apps;       ../Middlewares/Third_Party/LwIP/src/include/lwip/priv;       ../Middlewares/Third_Party/LwIP/src/include/lwip/prot;       ../Middlewares/Third_Party/LwIP/src/include/netif;       ../Middlewares/Third_Party/LwIP/src/include/compat/posix;       ../Middlewares/Third_Party/LwIP/src/include/compat/posix/arpa;       ../Middlewares/Third_Party/LwIP/src/include/compat/posix/net;       ../Middlewares/Third_Party/LwIP/src/include/compat/posix/sys;       ../Middlewares/Third_Party/LwIP/src/include/compat/stdc;       ../Middlewares/Third_Party/LwIP/system/arch;       ../Drivers/CMSIS/Include;       ..\TimeSpan;       ..\Memory;       ..\CoreDebug;       ..\HTTPServer;       ..\HTTPServer\json;       ..\FileSystem;       ..\Modbus;       ..\DeviceData</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -620,9 +620,6 @@
               <FilePath>..\DeviceData\DeviceData.h</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
           <GroupName>Drivers/STM32F4xx_HAL_Driver</GroupName>
@@ -6277,6 +6274,9 @@
               </FileOption>
             </File>
           </Files>
+        </Group>
+        <Group>
+          <GroupName>::CMSIS</GroupName>
         </Group>
       </Groups>
     </Target>

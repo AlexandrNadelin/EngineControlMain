@@ -152,6 +152,7 @@ HAL_StatusTypeDef HAL_DACEx_DualStop(DAC_HandleTypeDef *hdac)
   /* Return function status */
   return HAL_OK;
 }
+
 #endif /* DAC_CHANNEL2_SUPPORT */
 
 /**

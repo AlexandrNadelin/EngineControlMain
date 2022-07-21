@@ -21,10 +21,10 @@ function getDeviceData(){
 	  clearInterval(timerId);
 	  intervalTime=5000;
 	  timerId = setInterval(getDeviceData,intervalTime);
-	  if(++getDevDataErrorCounter>5){
+	  /*if(++getDevDataErrorCounter>5){
 		clearInterval(timerId);
 		//alert("Ошибка чтения данных.");
-	  }
+	  }*/
     }else{	
 	  let parameters = JSON.parse(request.response);
 	  getDevDataErrorCounter=0;

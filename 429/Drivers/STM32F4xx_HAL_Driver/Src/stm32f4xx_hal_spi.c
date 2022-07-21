@@ -1134,13 +1134,13 @@ error :
 HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, uint8_t *pTxData, uint8_t *pRxData, uint16_t Size,
                                           uint32_t Timeout)
 {
+#if (USE_SPI_CRC != 0U)
+  __IO uint32_t tmpreg = 0U;
+#endif /* USE_SPI_CRC */
   uint16_t             initial_TxXferCount;
   uint32_t             tmp_mode;
   HAL_SPI_StateTypeDef tmp_state;
   uint32_t             tickstart;
-#if (USE_SPI_CRC != 0U)
-  __IO uint32_t tmpreg = 0U;
-#endif /* USE_SPI_CRC */
 
   /* Variable used to alternate Rx and Tx during transfer */
   uint32_t             txallowed = 1U;
@@ -3156,15 +3156,12 @@ static void SPI_2linesRxISR_8BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_2linesRxISR_8BITCRC(struct __SPI_HandleTypeDef *hspi)
 {
-  __IO uint8_t  * ptmpreg8;
-  __IO uint8_t  tmpreg8 = 0;
+  __IO uint32_t tmpreg = 0U;
 
-  /* Initialize the 8bit temporary pointer */
-  ptmpreg8 = (__IO uint8_t *)&hspi->Instance->DR;
   /* Read 8bit CRC to flush Data Register */
-  tmpreg8 = *ptmpreg8;
+  tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
   /* To avoid GCC warning */
-  UNUSED(tmpreg8);
+  UNUSED(tmpreg);
 
   /* Disable RXNE and ERR interrupt */
   __HAL_SPI_DISABLE_IT(hspi, (SPI_IT_RXNE | SPI_IT_ERR));
@@ -3314,15 +3311,12 @@ static void SPI_2linesTxISR_16BIT(struct __SPI_HandleTypeDef *hspi)
   */
 static void SPI_RxISR_8BITCRC(struct __SPI_HandleTypeDef *hspi)
 {
-  __IO uint8_t  * ptmpreg8;
-  __IO uint8_t  tmpreg8 = 0;
+  __IO uint32_t tmpreg = 0U;
 
-  /* Initialize the 8bit temporary pointer */
-  ptmpreg8 = (__IO uint8_t *)&hspi->Instance->DR;
   /* Read 8bit CRC to flush Data Register */
-  tmpreg8 = *ptmpreg8;
+  tmpreg = READ_REG(*(__IO uint8_t *)&hspi->Instance->DR);
   /* To avoid GCC warning */
-  UNUSED(tmpreg8);
+  UNUSED(tmpreg);
 
   SPI_CloseRx_ISR(hspi);
 }
